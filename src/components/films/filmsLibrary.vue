@@ -21,44 +21,47 @@
 						</div>
 						<div class="row">
 
-							<button class="btn btn-info mb-2 mx-2">Sort by year</button>
-							<button class="btn btn-info mb-2 mx-2">Sort by name</button>
-							<button class="btn btn-info mb-2 mx-2">Sort by genre</button>
+							<button class="btn btn-info mb-2 mx-2 btn-sm" @click="sortFilms('year')">Sort by year
+								<Icon name="sort-amount-up" v-if="sortingBy.year === 'asc'"></Icon>
+								<Icon name="sort-amount-down" v-if="sortingBy.year === 'desc'"></Icon>
+							</button>
+							<button class="btn btn-info mb-2 mx-2 btn-sm" @click="sortFilms('name')">Sort by name
+								<Icon name="sort-amount-up" v-if="sortingBy.name === 'asc'"></Icon>
+								<Icon name="sort-amount-down" v-if="sortingBy.name === 'desc'"></Icon>
+							</button>
+							<button class="btn btn-info mb-2 mx-2 btn-sm" @click="sortFilms('genres')">Sort by genre
+								<Icon name="sort-amount-up" v-if="sortingBy.genres === 'asc'"></Icon>
+								<Icon name="sort-amount-down" v-if="sortingBy.genres === 'desc'"></Icon>
+							</button>
+
 							<div class="col">
-								<!--<select id="inputState" class="form-control">-->
-									<!--<option hidden>Filter by year</option>-->
-									<!--<option>1995</option>-->
-									<!--<option>2003</option>-->
-								<!--</select>-->
-								<b-input-group>
-									<b-form-select v-model="yearFilterSelected" :options="yearFilter">
+								<!--<b-input-group>-->
+									<b-form-select size="sm" v-model="yearFilterSelected" :options="yearFilter" @change="filterFilms($event, 'year')">
 										<template slot="first">
 											<option :value="null" disabled>-- Filter by year --</option>
 										</template>
 									</b-form-select>
-									<b-input-group-append>
-										<b-button variant="outline-info">reset</b-button>
-									</b-input-group-append>
-								</b-input-group>
+									<!--<b-input-group-append>-->
+										<!--<b-button variant="outline-info" size="sm">reset</b-button>-->
+									<!--</b-input-group-append>-->
+								<!--</b-input-group>-->
 							</div>
 							<div class="col">
-								<!--<select id="inputState" class="form-control">-->
-									<!--<option hidden>Filter by genre</option>-->
-									<!--<option>Action</option>-->
-									<!--<option>Thriller</option>-->
-								<!--</select>-->
-								<b-form-select v-model="genreFilterSelected" :options="genreFilter">
+								<b-form-select size="sm" v-model="genreFilterSelected" :options="genreFilter" @change="filterFilms($event, 'genres')">
 									<template slot="first">
 										<option :value="null" disabled>-- Filter by genre --</option>
 									</template>
 								</b-form-select>
 							</div>
+							<button class="btn btn-info mb-2 mx-2 btn-sm" @click="resetFilters">
+								<Icon name="redo" scale="1.5" title="clear filter"></Icon>
+							</button>
 							<div class="col">
 								<div class="btn-group btn-group-toggle" data-toggle="buttons">
-									<label class="btn btn-info" @click="type.table = true">
+									<label class="btn btn-info btn-sm" @click="type.table = true">
 										<input type="radio" name="options" id="option1" autocomplete="off" checked> Table
 									</label>
-									<label class="btn btn-info active" @click="type.cards = true">
+									<label class="btn btn-info active btn-sm" @click="type.cards = true">
 										<input type="radio" name="options" id="option2" autocomplete="off"> Cards
 									</label>
 								</div>
@@ -67,12 +70,15 @@
 					</div>
 					<hr>
 					<div v-if="type.cards" class="row justify-content-center px-2">
-						<film-card v-for="(film, index) in films" :film="film" :user-id="userId" :key="index"></film-card>
+						<film-card v-for="(film, index) in filteredFilms" :film="film" :user-id="userId" :key="index"></film-card>
 					</div>
 					<div v-if="type.table" class="card-body row">
-						<b-table class="table-bordered" striped hover :fields="fields" :items="films">
+						<b-table ref="tableFilms" class="table-bordered" striped hover :fields="fields" :items="filteredFilms">
 							<template slot="actions">
 								<b-button  size="sm"> Add to my gallery</b-button>
+							</template>
+							<template slot="poster" slot-scope="data">
+								<b-img width="80px" height="80px" :src="data.value" fluid></b-img>
 							</template>
 						</b-table>
 					</div>
@@ -93,9 +99,13 @@
 </template>
 
 <script>
+	import orderBy from 'lodash/orderBy';
 	import BButton from "bootstrap-vue/src/components/button/button";
 	import Icon from 'vue-awesome/components/Icon'
 	import 'vue-awesome/icons/star';
+	import 'vue-awesome/icons/redo';
+	import 'vue-awesome/icons/sort-amount-up';
+	import 'vue-awesome/icons/sort-amount-down';
 	import {getUserFilms} from "../../services/user/user.service";
 	import filmCard from 'src/components/films/filmCard';
 	import Film from "./film";
@@ -104,13 +114,18 @@
 	import BInputGroupAppend from "bootstrap-vue/src/components/input-group/input-group-append";
 	export default {
 		name: "filmsLibrary",
-		components: {BInputGroupAppend, BInputGroup, BFormSelect, Film, BButton, Icon, filmCard},
+		components: {Icon, filmCard},
 		computed: {
 			userFilms() {
 				return this.$store.getters.user.filmId;
 			}
 		},
 		watch: {
+			filteredFilms(val) {
+				if(this.type.table === true) {
+					this.$refs.tableFilms.refresh();
+				}
+			},
 			'type.table' (val) {
 				if (val) {
 					this.type.cards = false;
@@ -144,6 +159,7 @@
 					cards: true
 				},
 				fields: [
+					{key: 'poster', label: 'poster'},
 					{key: 'name', label: 'Title'},
 					{key: 'year', label: 'Year'},
 					{key: 'producer', label: 'Producer'},
@@ -151,6 +167,11 @@
 					{key: 'actions', label: 'Actions'}
 				],
 				films: [],
+				filteredFilms: [],
+				filteredBy: {
+				},
+				sortingBy: {
+				},
 				userId: null,
 				yearFilter: [],
 				yearFilterSelected: null,
@@ -159,8 +180,42 @@
 			}
 		},
 		methods: {
+			sortFilms(name) {
+				if(this.sortingBy[name] === 'asc') {
+					this.sortingBy[name] = 'desc'
+				} else if(this.sortingBy[name] === 'desc') {
+					delete(this.sortingBy[name]);
+				} else {
+					this.sortingBy[name] = 'asc';
+				}
+
+				this.filteredFilms = orderBy(this.filteredFilms, Object.keys(this.sortingBy), Object.values(this.sortingBy));
+
+			},
+			resetFilters() {
+				this.filteredFilms = this.films;
+				this.yearFilterSelected = null;
+				this.genreFilterSelected = null;
+				this.filteredBy = {};
+				this.sortingBy = {};
+			},
+			filterFilms(filterValue, filterName) {
+				let filteredFilms = this.films;
+				// at first save filter
+				this.filteredBy[filterName] = filterValue;
+				//and after filter films by all filters
+				for (let filter in this.filteredBy) {
+					if (this.filteredBy[filter] !== '') {
+						filteredFilms = filteredFilms.filter(film => film[filter].includes(this.filteredBy[filter]));
+					}
+
+				}
+
+				this.filteredFilms = filteredFilms;
+			},
 			setFilms(films) {
-				this.films = films
+				this.films = films;
+				this.filteredFilms = films;
 			},
 			setUserId(id) {
 				this.userId = parseInt(id);

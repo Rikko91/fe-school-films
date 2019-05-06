@@ -2,19 +2,13 @@
 	<div>
 	<div class="container align-items-end">
 		<div class="row">
-			<h3>The Shawshank Redemption</h3>
+			<h3 >{{ film.name }}</h3>
 		</div>
 		<div class="row">
 			<div class="col-lg-3 col-sm-4">
 				<img :src="film.poster" class="img-fluid img-thumbnail rounded" style="width: 300px; height: 350px">
 			</div>
 			<div class="col-lg-9">
-				<!--<ul class="list-group row">-->
-					<!--<div class="list-group-item">-->
-						<!--<div class="col-3">Year</div>-->
-						<!--<div class="col-9">1995</div>-->
-					<!--</div>-->
-				<!--</ul>-->
 				<table class="table table-striped">
 					<tbody>
 						<tr class="text-left">
@@ -83,9 +77,17 @@
 				}
 			}
 		},
+		computed: {
+			lastSelectedFilm() {
+				return this.$store.getters.lastSelectedFilm;
+			}
+		},
 		methods: {
 			setFilm(film) {
 				Object.assign(this.film, film);
+				if (!this.lastSelectedFilm.id) {
+					this.$store.dispatch('SET_SELECTED_FILM', film);
+				}
 			}
 		},
 		beforeRouteEnter(to , from , next) {
