@@ -70,6 +70,29 @@ export function getFriends(id) {
 	});
 }
 
+export async function getFriendsRequests(id) {
+	return axios.get('/users/' + id).then(response =>  {
+		let getUsersInfoPromises = [];
+		let usersInfo = [];
+		response.data.friendsRequests.forEach((friendRequest) => {
+			getUsersInfoPromises.push(getUserInfo(friendRequest.userId).then(user => {
+				usersInfo.push({
+					id: user.id,
+					name: user.name,
+					surname: user.surname,
+					avatar: user.avatar,
+					type: friendRequest.type
+				}
+			)
+			}));
+		});
+
+		return axios.all(getUsersInfoPromises).then(() => {
+			return usersInfo;
+		});
+	});
+}
+
 export function getUserInfo(id) {
 	return axios.get('/users/' + id).then(response => response.data)
 }

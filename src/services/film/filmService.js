@@ -28,3 +28,9 @@ export function updateComment(comment) {
 export function getFilmById(id) {
 	return axios.get('/films/' + id).then(response => response.data);
 }
+
+export function addNewComment(comment) {
+	return axios.post('/comments', comment).then(response => {
+		return response.data;
+	})
+}
