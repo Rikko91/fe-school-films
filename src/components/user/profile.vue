@@ -72,54 +72,54 @@
 					<div class="card-header">
 						<h5>Friends requests</h5>
 					</div>
-
-					<div class="card my-2 mx-2 shadow p-3 mb-3 bg-white rounded">
-						<div class="row">
-							<div class="col">
-								<div class="alert alert-info" role="alert">You got friend request</div>
-							</div>
-						</div>
-						<div class="row ">
-							<div class="col-4">
-								<img src="../../assets/no-avatar.png" class="card-img">
-							</div>
-							<div class="col-8 px-3">
-								<div class="row">
-									<h4> John Doe</h4>
-								</div>
-								<div class="row">
-									<div class="col align-items-center">
-										<div class="btn-group-vertical">
-											<button class="btn btn-outline-info">Accept</button>
-											<button class="btn btn-outline-info mt-1">Decline</button>
-										</div>
-									</div>
-								</div>
-								<!--<div class="card-block px-3">-->
+					<user-friend-request-card v-for="(user, index) in friendRequests" :user="user" :key="index"></user-friend-request-card>
+					<!--<div class="card my-2 mx-2 shadow p-3 mb-3 bg-white rounded">-->
+						<!--<div class="row">-->
+							<!--<div class="col">-->
+								<!--<div class="alert alert-info" role="alert">You got friend request</div>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--<div class="row ">-->
+							<!--<div class="col-4">-->
+								<!--<img src="../../assets/no-avatar.png" class="card-img">-->
+							<!--</div>-->
+							<!--<div class="col-8 px-3">-->
+								<!--<div class="row">-->
+									<!--<h4> John Doe</h4>-->
 								<!--</div>-->
-							</div>
-
-						</div>
-					</div>
-					<div class="card my-2 mx-2 shadow p-3 mb-3 bg-white rounded">
-						<div class="row ">
-							<div class="col-4">
-								<img src="../../assets/no-avatar.png" class="card-img">
-							</div>
-							<div class="col-8 px-3">
-								<div class="row">
-									<h4> John Doe</h4>
-								</div>
-								<div class="row">
-									<span>You have send friend request</span>
-									<span>You request is waiting for approval</span>
-								</div>
-								<!--<div class="card-block px-3">-->
+								<!--<div class="row">-->
+									<!--<div class="col align-items-center">-->
+										<!--<div class="btn-group-vertical">-->
+											<!--<button class="btn btn-outline-info">Accept</button>-->
+											<!--<button class="btn btn-outline-info mt-1">Decline</button>-->
+										<!--</div>-->
+									<!--</div>-->
 								<!--</div>-->
-							</div>
+								<!--&lt;!&ndash;<div class="card-block px-3">&ndash;&gt;-->
+								<!--&lt;!&ndash;</div>&ndash;&gt;-->
+							<!--</div>-->
 
-						</div>
-					</div>
+						<!--</div>-->
+					<!--</div>-->
+					<!--<div class="card my-2 mx-2 shadow p-3 mb-3 bg-white rounded">-->
+						<!--<div class="row ">-->
+							<!--<div class="col-4">-->
+								<!--<img src="../../assets/no-avatar.png" class="card-img">-->
+							<!--</div>-->
+							<!--<div class="col-8 px-3">-->
+								<!--<div class="row">-->
+									<!--<h4> John Doe</h4>-->
+								<!--</div>-->
+								<!--<div class="row">-->
+									<!--<span>You have send friend request</span>-->
+									<!--<span>You request is waiting for approval</span>-->
+								<!--</div>-->
+								<!--&lt;!&ndash;<div class="card-block px-3">&ndash;&gt;-->
+								<!--&lt;!&ndash;</div>&ndash;&gt;-->
+							<!--</div>-->
+
+						<!--</div>-->
+					<!--</div>-->
 				</div>
 			</div>
 		</div>
@@ -131,16 +131,18 @@
 	import Icon from 'vue-awesome/components/Icon';
 	import 'vue-awesome/icons/user-edit';
 	import userFriendCard from 'src/components/user/userFriendCard';
-	import {getFriends, saveAvatar} from "src/services/user/user.service";
+	import userFriendRequestCard from 'src/components/user/userFriendRequestCard';
+	import {getFriends, saveAvatar, getFriendsRequests} from "src/services/user/user.service";
 	export default {
 		name: "Profile",
 		components: {
 			Icon,
-			userFriendCard
+			userFriendCard,
+			userFriendRequestCard
 		},
 		data() {
 			return {
-				avatar: '',
+				avatar: ''
 			}
 		},
 		computed: {
@@ -149,6 +151,9 @@
 			},
 			user() {
 				return this.$store.getters.user;
+			},
+			friendRequests() {
+				return this.$store.getters.friendRequests;
 			}
 		},
 		methods: {
@@ -157,7 +162,6 @@
 				if (typeof FileReader === 'function') {
 					let reader = new window.FileReader();
 					reader.onload = event => {
-						console.log(event.target.result);
 						saveAvatar(this.user.id, event.target.result);
 						this.avatar = event.target.result;
 					};
@@ -171,6 +175,10 @@
 			getFriends(this.user.id).then(friends => {
 				this.$store.dispatch('SET_FRIENDS', friends);
 			});
+
+			getFriendsRequests(this.user.id).then(friendRequests => {
+				this.$store.dispatch('SET_FRIEND_REQUESTS', friendRequests);
+			})
 		}
 	}
 </script>

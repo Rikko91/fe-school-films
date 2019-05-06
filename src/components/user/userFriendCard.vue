@@ -2,7 +2,7 @@
 	<div class="card my-2 mx-2 shadow p-3 mb-3 bg-white rounded">
 		<div class="row ">
 			<div class="col-4">
-				<img :src="user.avatar" class="card-img">
+				<img :src="userAvatar" class="card-img">
 			</div>
 			<div class="col-8 px-3">
 				<div class="row">
@@ -49,6 +49,9 @@
 			},
 			friends() {
 				return this.$store.getters.friends;
+			},
+			userAvatar() {
+				return this.user.avatar || require('../../assets/no-avatar.png');
 			}
 		},
 		watch: {
