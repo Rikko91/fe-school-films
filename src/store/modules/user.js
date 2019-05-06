@@ -39,6 +39,9 @@ const userModule = {
 			state.friendRequests = state.friendRequests.filter((userFriendRequest) => {
 				return userFriendRequest.id !== user.id;
 			});
+		},
+		ADD_USER_FRIEND_REQUEST(state, user) {
+			state.friendRequests.push(user);
 		}
 	},
 	actions: {
@@ -65,6 +68,9 @@ const userModule = {
 		},
 		REMOVE_USER_FROM_FRIEND_REQUESTS({commit}, user) {
 			commit('REMOVE_USER_FROM_FRIEND_REQUESTS', user);
+		},
+		ADD_USER_FRIEND_REQUEST({commit}, user) {
+			commit('ADD_USER_FRIEND_REQUEST', user);
 		}
 	},
 	getters: {

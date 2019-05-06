@@ -6,7 +6,7 @@
 			</div>
 			<div class="col-8 px-3">
 				<div class="row">
-					<h4>{{userNameInfo}}</h4>
+					<h5>{{ userNameInfo }}</h5>
 				</div>
 				<div class="row">
 					<div class="col align-items-center">
@@ -16,8 +16,6 @@
 						</div>
 					</div>
 				</div>
-				<!--<div class="card-block px-3">-->
-				<!--</div>-->
 			</div>
 
 		</div>

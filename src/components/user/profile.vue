@@ -62,7 +62,7 @@
 					<div class="card-header">
 						<h5>You have {{friends.length}} friends</h5>
 					</div>
-					<template v-for="friend in friends" v-if="friends">
+					<template v-for="friend in friends">
 						<user-friend-card :user="friend" :key="friend.id"></user-friend-card>
 					</template>
 				</div>
@@ -70,56 +70,41 @@
 			<div class="col-lg-5 col-sm-12">
 				<div class="card border-info shadow mb-3 bg-white rounded">
 					<div class="card-header">
-						<h5>Friends requests</h5>
+						<ul class="nav nav-tabs card-header-tabs" role="tablist">
+							<li class="nav-item">
+								<a
+									class="nav-link active"
+									href="#current-friend-requests"
+									id="user-comments-tab"
+									role="tab"
+									data-toggle="tab"
+								>
+									<h5 class="reviews text-capitalize">Current requests <b-badge variant="info">{{ friendRequests.length }}</b-badge></h5>
+								</a>
+							</li>
+							<li class="nav-item">
+								<a
+									class="nav-link"
+									href="#add-new-friend-request"
+									role="tab"
+									data-toggle="tab"
+								>
+									<h5 class="reviews text-capitalize">Add new friend</h5>
+								</a>
+							</li>
+						</ul>
 					</div>
-					<user-friend-request-card v-for="(user, index) in friendRequests" :user="user" :key="index"></user-friend-request-card>
-					<!--<div class="card my-2 mx-2 shadow p-3 mb-3 bg-white rounded">-->
-						<!--<div class="row">-->
-							<!--<div class="col">-->
-								<!--<div class="alert alert-info" role="alert">You got friend request</div>-->
-							<!--</div>-->
-						<!--</div>-->
-						<!--<div class="row ">-->
-							<!--<div class="col-4">-->
-								<!--<img src="../../assets/no-avatar.png" class="card-img">-->
-							<!--</div>-->
-							<!--<div class="col-8 px-3">-->
-								<!--<div class="row">-->
-									<!--<h4> John Doe</h4>-->
-								<!--</div>-->
-								<!--<div class="row">-->
-									<!--<div class="col align-items-center">-->
-										<!--<div class="btn-group-vertical">-->
-											<!--<button class="btn btn-outline-info">Accept</button>-->
-											<!--<button class="btn btn-outline-info mt-1">Decline</button>-->
-										<!--</div>-->
-									<!--</div>-->
-								<!--</div>-->
-								<!--&lt;!&ndash;<div class="card-block px-3">&ndash;&gt;-->
-								<!--&lt;!&ndash;</div>&ndash;&gt;-->
-							<!--</div>-->
-
-						<!--</div>-->
-					<!--</div>-->
-					<!--<div class="card my-2 mx-2 shadow p-3 mb-3 bg-white rounded">-->
-						<!--<div class="row ">-->
-							<!--<div class="col-4">-->
-								<!--<img src="../../assets/no-avatar.png" class="card-img">-->
-							<!--</div>-->
-							<!--<div class="col-8 px-3">-->
-								<!--<div class="row">-->
-									<!--<h4> John Doe</h4>-->
-								<!--</div>-->
-								<!--<div class="row">-->
-									<!--<span>You have send friend request</span>-->
-									<!--<span>You request is waiting for approval</span>-->
-								<!--</div>-->
-								<!--&lt;!&ndash;<div class="card-block px-3">&ndash;&gt;-->
-								<!--&lt;!&ndash;</div>&ndash;&gt;-->
-							<!--</div>-->
-
-						<!--</div>-->
-					<!--</div>-->
+					<div class="card-body">
+						<div class="tab-content">
+							<div class="tab-pane active" id="current-friend-requests" role="tabpanel">
+								<user-friend-request-card v-for="(user, index) in friendRequests" :user="user" :key="index"></user-friend-request-card>
+							</div>
+							<div class="tab-pane w-100" id="add-new-friend-request" role="tabpanel">
+								<b-form-input placeholder="find user" @input="findUsers"></b-form-input>
+								<user-friend-request-card v-for="(user, index) in usersForAddRequest" :user="user" :key="index"></user-friend-request-card>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -132,7 +117,8 @@
 	import 'vue-awesome/icons/user-edit';
 	import userFriendCard from 'src/components/user/userFriendCard';
 	import userFriendRequestCard from 'src/components/user/userFriendRequestCard';
-	import {getFriends, saveAvatar, getFriendsRequests} from "src/services/user/user.service";
+	import {getFriends, saveAvatar, getFriendsRequests, getAllUsers} from "src/services/user/user.service";
+	import throttle from 'lodash/throttle';
 	export default {
 		name: "Profile",
 		components: {
@@ -142,7 +128,9 @@
 		},
 		data() {
 			return {
-				avatar: ''
+				avatar: '',
+				allUsers: [],
+				usersForAddRequest: []
 			}
 		},
 		computed: {
@@ -157,6 +145,18 @@
 			}
 		},
 		methods: {
+			findUsers: throttle(function(userString) {
+				if (userString === '') {
+					this.usersForAddRequest = [];
+					return;
+				}
+
+				let filteredUsers = this.allUsers.filter((user) => {
+					return user.name.includes(userString) || user.surname.includes(userString)
+				});
+
+				this.usersForAddRequest = filteredUsers;
+			}, 1000),
 			onAvatarSelected(event) {
 				let avatar = event.target.files[0];
 				if (typeof FileReader === 'function') {
@@ -178,7 +178,11 @@
 
 			getFriendsRequests(this.user.id).then(friendRequests => {
 				this.$store.dispatch('SET_FRIEND_REQUESTS', friendRequests);
-			})
+			});
+
+			getAllUsers().then(users => {
+				this.allUsers = users;
+			});
 		}
 	}
 </script>

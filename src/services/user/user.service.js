@@ -124,3 +124,7 @@ export function getUserByEmail(email) {
 		return response.data;
 	})
 }
+
+export function getAllUsers() {
+	return axios.get('/users').then(response => response.data)
+}
