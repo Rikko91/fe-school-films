@@ -3,7 +3,8 @@ const userModule = {
 		isLogged: false,
 		token: localStorage.getItem('token') || '',
 		user : {},
-		friends: []
+		friends: [],
+		friendRequests: []
 	},
 	mutations: {
 		LOGOUT(state) {
@@ -27,6 +28,17 @@ const userModule = {
 			if( index > -1) {
 				state.user.filmId.splice(index, 1);
 			}
+		},
+		ADD_FRIEND(state, user) {
+			state.friends.push(user);
+		},
+		SET_FRIEND_REQUESTS(state, friendRequests) {
+			state.friendRequests = friendRequests;
+		},
+		REMOVE_USER_FROM_FRIEND_REQUESTS(state, user) {
+			state.friendRequests = state.friendRequests.filter((userFriendRequest) => {
+				return userFriendRequest.id !== user.id;
+			});
 		}
 	},
 	actions: {
@@ -44,6 +56,15 @@ const userModule = {
 		},
 		REMOVE_FILM_FROM_USER({commit}, filmId) {
 			commit('REMOVE_FILM_FROM_USER', filmId);
+		},
+		ADD_FRIEND({commit}, user) {
+			commit('ADD_FRIEND', user);
+		},
+		SET_FRIEND_REQUESTS({commit}, friendRequests) {
+			commit('SET_FRIEND_REQUESTS', friendRequests);
+		},
+		REMOVE_USER_FROM_FRIEND_REQUESTS({commit}, user) {
+			commit('REMOVE_USER_FROM_FRIEND_REQUESTS', user);
 		}
 	},
 	getters: {
@@ -61,6 +82,9 @@ const userModule = {
 		},
 		isLogged: state => {
 			return state.isLogged;
+		},
+		friendRequests: state => {
+			return state.friendRequests;
 		}
 
 	}
