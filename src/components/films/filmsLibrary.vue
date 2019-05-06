@@ -100,7 +100,6 @@
 
 <script>
 	import orderBy from 'lodash/orderBy';
-	import BButton from "bootstrap-vue/src/components/button/button";
 	import Icon from 'vue-awesome/components/Icon'
 	import 'vue-awesome/icons/star';
 	import 'vue-awesome/icons/redo';
@@ -108,10 +107,6 @@
 	import 'vue-awesome/icons/sort-amount-down';
 	import {getUserFilms} from "../../services/user/user.service";
 	import filmCard from 'src/components/films/filmCard';
-	import Film from "./film";
-	import BFormSelect from "bootstrap-vue/src/components/form-select/form-select";
-	import BInputGroup from "bootstrap-vue/src/components/input-group/input-group";
-	import BInputGroupAppend from "bootstrap-vue/src/components/input-group/input-group-append";
 	export default {
 		name: "filmsLibrary",
 		components: {Icon, filmCard},
