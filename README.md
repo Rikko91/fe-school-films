@@ -1,29 +1,23 @@
-# hello-world
 
 ## Project setup
 ```
-yarn install
+npm install
 ```
 
 ### Compiles and hot-reloads for development
 ```
 yarn run serve
 ```
-
-### Compiles and minifies for production
+Also you need to run json-server as a backend part. You can do this in different ways:
 ```
-yarn run build
+npm install -g json-server
+json-server db.json -m ./node_modules/json-server-auth
 ```
-
-### Run your tests
+Or if you don`t want to install json-server globally you can run it by npx:
 ```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
+npx json-server db.json -m ./node_modules/json-server-auth
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+To check all functionality you can use this user credentials:  
+email -> oleg.rikko91@gmail.com  
+password -> 12345
