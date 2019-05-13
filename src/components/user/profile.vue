@@ -5,7 +5,7 @@
 		<div class="row">
 			<div class="col-lg-2 col-sm-4">
 				<img :src="avatar" class="card-img">
-				<label class="btn btn-info my-2">
+				<label class="btn btn-info my-2" v-if="isDataChanging">
 					Change avatar
 					<Icon name="user-edit"></Icon>
 					<input type="file" @change="onAvatarSelected" hidden>
@@ -17,34 +17,37 @@
 						<div class="input-group-append">
 							<span class="input-group-text">Name</span>
 						</div>
-						<input type="text" class="form-control" v-model="user.name" readonly>
+						<input type="text" class="form-control" v-model="userData.name" :readonly="!isDataChanging">
 					</div>
 					<div class="input-group my-2">
 						<div class="input-group-append">
 							<span class="input-group-text">Surname</span>
 						</div>
-						<input type="text" class="form-control" v-model="user.surname" readonly>
+						<input type="text" class="form-control" v-model="userData.surname" :readonly="!isDataChanging">
 					</div>
 					<div class="input-group my-2">
 						<div class="input-group-append">
 							<span class="input-group-text">Year of birth</span>
 						</div>
-						<input type="text" class="form-control" v-model="user.year" readonly>
+						<input type="text" class="form-control" v-model="userData.year" :readonly="!isDataChanging">
 					</div>
-					<div class="input-group my-2">
-						<div class="input-group-append">
-							<span class="input-group-text">City</span>
-						</div>
-						<input type="text" class="form-control" v-model="user.city" readonly>
-					</div>
+					<!--<div class="input-group my-2">-->
+						<!--<div class="input-group-append">-->
+							<!--<span class="input-group-text">City</span>-->
+						<!--</div>-->
+						<!--<input type="text" class="form-control" v-model="user.city" readonly>-->
+					<!--</div>-->
 				</div>
 			</div>
 			<div class="col-lg-2 col-sm-2 my-auto">
 				<div class="row">
 					<div class="col-12">
-						<button class="btn btn-outline-info">Change data</button>
+						<button class="btn btn-outline-info" v-if="!isDataChanging" @click="isDataChanging = !isDataChanging">Change data</button>
+						<button class="btn btn-outline-info" v-else @click="saveUserData">
+							<Icon name="check"></Icon>
+							Save
+						</button>
 					</div>
-
 				</div>
 				<div class="row">
 					<div class="col-12">
@@ -115,6 +118,7 @@
 <script>
 	import Icon from 'vue-awesome/components/Icon';
 	import 'vue-awesome/icons/user-edit';
+	import 'vue-awesome/icons/check';
 	import userFriendCard from 'src/components/user/userFriendCard';
 	import userFriendRequestCard from 'src/components/user/userFriendRequestCard';
 	import {getFriends, saveAvatar, getFriendsRequests, getAllUsers} from "src/services/user/user.service";
@@ -128,9 +132,15 @@
 		},
 		data() {
 			return {
+				isDataChanging: false,
 				avatar: '',
 				allUsers: [],
-				usersForAddRequest: []
+				usersForAddRequest: [],
+				userData: {
+					name: '',
+					surname: '',
+					year: ''
+				}
 			}
 		},
 		computed: {
@@ -145,6 +155,11 @@
 			}
 		},
 		methods: {
+			saveUserData() {
+				this.$store.dispatch('CHANGE_USER_CREDENTIALS', this.userData).then(() => {
+						this.isDataChanging = false;
+				});
+			},
 			findUsers: throttle(function(userString) {
 				if (userString === '') {
 					this.usersForAddRequest = [];
@@ -171,6 +186,10 @@
 			}
 		},
 		created() {
+			this.userData.name = this.user.name;
+			this.userData.surname = this.user.surname;
+			this.userData.year = this.user.year;
+
 			this.avatar = this.user.avatar;
 			getFriends(this.user.id).then(friends => {
 				this.$store.dispatch('SET_FRIENDS', friends);

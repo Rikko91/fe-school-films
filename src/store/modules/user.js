@@ -42,9 +42,16 @@ const userModule = {
 		},
 		ADD_USER_FRIEND_REQUEST(state, user) {
 			state.friendRequests.push(user);
+		},
+		CHANGE_USER_CREDENTIALS(state, credentials) {
+			state.user.name = credentials.name;
+			state.user.surname = credentials.surname;
 		}
 	},
 	actions: {
+		CHANGE_USER_CREDENTIALS({commit}, credentials) {
+			commit('CHANGE_USER_CREDENTIALS', credentials);
+		},
 		LOGOUT({commit}) {
 			commit('LOGOUT');
 		},

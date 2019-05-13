@@ -13,6 +13,7 @@
 						<label for="password">Your password</label>
 						<input type="password" v-model="password" name="password" class="form-control mx-auto col-8" placeholder="Enter your password here">
 					</div>
+					<b-alert variant="danger" :show="errorMessage.length > 0">{{ errorMessage }}</b-alert>
 					<div clas="form-group">
 						<button @click="login" class="btn btn-outline-light mb-2">Login</button>
 						<router-link to="/register" class="btn btn-link">Create a new account</router-link>
@@ -41,6 +42,7 @@ export default {
 		return {
 			email: '',
 			password: '',
+			errorMessage: ''
 		}
 	},
 	methods: {
@@ -50,6 +52,7 @@ export default {
 		login() {
 			userServiceLogin(this.user).then(
 				response => {
+					console.log(response.status);
 					let base64Url = response.data.accessToken.split('.')[1];
 					let base64 = base64Url.replace('/-/g', '+').replace('/_/g', '/');
 					let payload = JSON.parse(window.atob(base64));
@@ -65,10 +68,14 @@ export default {
 
 
 				},
-				error => {
-					//set the user is not exist
+			).catch(error => {
+				if (error.response) {
+					this.errorMessage = error.response.data;
+					console.log(error.response.data);
+					console.log(error.response.status);
+					console.log(error.response.headers);
 				}
-			);
+			});
 		}
 	}
 }

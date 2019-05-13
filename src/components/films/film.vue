@@ -41,13 +41,25 @@
 								<!--<span class="fa fa-star"></span>-->
 							</td>
 						</tr>
+						<tr>
+							<td>
+
+							</td>
+						</tr>
 					</tbody>
 				</table>
 				<span>{{film.description}}</span>
+				<div class="row my-2">
+					<b-button variant="info" @click="showModal">
+						<Icon name="edit"></Icon>
+						Edit
+					</b-button>
+				</div>
 			</div>
 		</div>
 		<h2>Comments</h2>
 		<comments></comments>
+		<add-change-film :new-film="false" ref="addChangeFilm"></add-change-film>
 	</div>
 	</div>
 </template>
@@ -55,14 +67,17 @@
 <script>
 	import Icon from 'vue-awesome/components/Icon'
 	import 'vue-awesome/icons/star';
+	import 'vue-awesome/icons/edit';
 	import Header from '../main/header';
 	import comments from 'src/components/comments/comments';
 	import {getFilmById} from "../../services/film/filmService";
+	import addChangeFilm from 'src/components/films/addChangeFilm';
 	export default {
 		components: {
 			Icon,
 			Header,
-			comments
+			comments,
+			addChangeFilm
 		},
 		name: "Film",
 		data() {
@@ -80,9 +95,19 @@
 		computed: {
 			lastSelectedFilm() {
 				return this.$store.getters.lastSelectedFilm;
+			},
+		},
+		watch: {
+			lastSelectedFilm(value) {
+				this.film = value;
+			},
+			'$store.state.film.lastSelectedFilm'(val) {
 			}
 		},
 		methods: {
+			showModal() {
+				this.$refs.addChangeFilm.show();
+			},
 			setFilm(film) {
 				Object.assign(this.film, film);
 				if (!this.lastSelectedFilm.id) {

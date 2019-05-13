@@ -1,5 +1,5 @@
 <template>
-	<div class="col-lg-3 col-sm-12 mb-4">
+	<div class="col-lg-3 col-sm-4 mb-4">
 		<div class="card shadow-lg">
 			<div class="my-card-image border-bottom rounded" :style="{'background-image': 'url(' + film.poster + ')'}" @click="openFilm">
 			</div>

@@ -88,8 +88,8 @@
 			filmId() {
 				return this.$store.getters.lastSelectedFilm.id;
 			},
-			userId() {
-				return this.$store.getters.user.id;
+			user() {
+				return this.$store.getters.user
 			}
 		},
 		watch: {
@@ -106,9 +106,12 @@
 			}
 		},
 		methods: {
+			goToCommentTab() {
+				document.getElementById('user-comments-tab').click();
+			},
 			addComment() {
 				let comment = {
-					userId: this.userId,
+					userId: this.user.id,
 					filmId: this.filmId,
 					message: this.textComment,
 					likes: '0',
@@ -116,7 +119,17 @@
 					created: dayjs().format('YYYY-MM-DD')
 				};
 
-				addNewComment(comment);
+				addNewComment(comment).then(() => {
+					comment.user = {
+						avatar: this.user.avatar,
+						name: this.user.name,
+						surname: this.user.surname
+					};
+
+					this.comments.push(comment);
+					this.textComment = '';
+					this.goToCommentTab();
+				});
 			}
 		},
 		mounted() {

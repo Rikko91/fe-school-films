@@ -9,6 +9,7 @@ import store from 'src/store/index';
 import axios from 'axios';
 import router from 'src/router/index';
 import 'nprogress/nprogress.css';
+import {getUserInfo} from "src//services/user/user.service";
 
 import Vuelidate from 'vuelidate';
 Vue.use(Vuelidate);
@@ -27,7 +28,10 @@ new Vue({
 	beforeCreate() {
 		const user = JSON.parse(localStorage.getItem('user'));
 		if (user) {
-			this.$store.dispatch('LOGIN', user)
+			getUserInfo(user.id).then(userData => {
+					this.$store.dispatch('LOGIN', userData)
+			});
+
 		}
 	}
 }).$mount('#app')

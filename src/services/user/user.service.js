@@ -13,7 +13,7 @@ export function login(user) {
 				resolve(response);
 			})
 			.catch(err => {
-				// commit('auth_error')
+				console.log(err);
 				localStorage.removeItem('token');
 				reject(err)
 			})
@@ -41,6 +41,7 @@ export function logout(){
 	return new Promise((resolve) => {
 		//commit('logout');
 		localStorage.removeItem('token');
+		localStorage.removeItem('user')
 		delete axios.defaults.headers.common['Authorization'];
 		resolve();
 	})
